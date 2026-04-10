@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buffalo Grove Park District — Staff Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --teal:   #00A9CE;
+    --brown:  #5C462B;
+    --bg:     #F8F7F4;
+    --white:  #FFFFFF;
+    --border: rgba(92,70,43,0.10);
+    --text:   #2B1F10;
+    --muted:  #A09080;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ---- Header ---- */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 1rem; }
+
+  .back-btn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 6px 12px 6px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 2px;
+    transition: opacity 0.15s;
+    font-family: 'Nunito Sans', Arial, sans-serif;
+  }
+  .back-btn:hover { opacity: 0.65; }
+  .back-btn.visible { display: flex; }
+  .back-btn svg { width: 13px; height: 13px; stroke: var(--teal); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .brand-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brown);
+  }
+
+  .header-date {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  /* ---- Pages ---- */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ---- Shared layout ---- */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3.5rem 2rem 5rem;
+  }
+
+  /* ---- Hero ---- */
+  .hero {
+    margin-bottom: 2.75rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--brown);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+
+  .hero h1 strong { font-weight: 700; }
+
+  /* ---- Search ---- */
+  .search-wrap { margin-bottom: 1.75rem; }
+
+  .search-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 9px 14px;
+    font-family: 'Nunito Sans', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: var(--teal); }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* ---- App list ---- */
+  .app-list {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--white);
+  }
+
+  .app-row {
+    display: flex;
+    align-items: center;
+    padding: 1.15rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-row:last-child { border-bottom: none; }
+
+  .app-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.15s;
+  }
+  .app-row:hover { background: #FAFAF9; }
+  .app-row:hover::before { background: var(--accent); }
+
+  .app-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--icon-bg);
+    transition: opacity 0.15s;
+  }
+  .app-icon-wrap svg {
+    width: 15px;
+    height: 15px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .app-info { flex: 1; min-width: 0; }
+
+  .app-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--brown);
+    margin-bottom: 2px;
+  }
+
+  .app-desc {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .app-chevron {
+    color: var(--muted);
+    font-size: 16px;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.12s, transform 0.12s;
+  }
+  .app-row:hover .app-chevron { opacity: 1; transform: translateX(0); }
+
+  .no-results {
+    display: none;
+    padding: 2.5rem;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--muted);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  /* ---- Footer ---- */
+  .footer {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-left { font-size: 12px; font-weight: 300; color: var(--muted); }
+  .footer-right { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); }
+
+  /* ---- Detail page ---- */
+  .detail-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .detail-title {
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--brown);
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+  }
+
+  .detail-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .launch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Nunito Sans', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--teal);
+    border: none;
+    border-radius: 2px;
+    padding: 12px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .launch-btn:hover { opacity: 0.82; }
+
+  @media (max-width: 600px) {
+    .header { padding: 0 1rem; }
+    .main { padding: 2rem 1rem 3rem; }
+    .hero h1 { font-size: 28px; }
+    .app-tag { display: none; }
+    .header-date { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <button class="back-btn" id="backBtn" onclick="showHome()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portal Home
+    </button>
+    <div class="brand-name">Buffalo Grove Park District</div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<!-- HOME PAGE -->
+<div class="page active" id="homePage">
+  <div class="main">
+
+    <div class="hero">
+      <div class="eyebrow">Staff Portal</div>
+      <h1>Good <span id="greetWord">morning</span>,<br><strong>welcome back.</strong></h1>
+    </div>
+
+    <div class="search-wrap">
+      <input class="search-input" type="text" placeholder="Search applications..." id="searchInput" oninput="filterApps()" />
+    </div>
+
+    <div class="section-label">All Applications</div>
+
+    <div class="app-list" id="appList"></div>
+    <div class="no-results" id="noResults">No applications match your search.</div>
+
+    <div class="footer">
+      <div class="footer-left" id="footerText">Need help? Contact your system administrator.</div>
+      <div class="footer-right">bgparks.org</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL PAGE -->
+<div class="page" id="detailPage">
+  <div class="main">
+    <div class="detail-header">
+      <div class="detail-tag" id="detailTag"></div>
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+    </div>
+    <a class="launch-btn" id="detailLaunch" href="#" target="_blank">Open Application →</a>
+  </div>
+</div>
+
+<script>
+
+  /* ============================================
+     PORTAL SETTINGS — EDIT HERE
+  ============================================ */
+  const FOOTER_TEXT = "Need help? Contact your system administrator.";
+
+  /* ============================================
+     APP URLS — EDIT HERE
+     Replace # with your real URLs.
+  ============================================ */
+  const APPS = [
+    {
+      name: "Cost Recovery",
+      desc: "Log and recover project and program expenses",
+      url: "#",
+      tag: "Recreation",
+      tagBg: "#FDF0E6", tagColor: "#A33900",
+      accent: "#E35205",
+      icon: `<svg viewBox="0 0 24 24"><path d="M3 17l4-4 4 4 4-6 4-4"/><path d="M20 7h-3M20 7v3"/></svg>`
+    },
+    {
+      name: "PTO Requests",
+      desc: "Request time off and view your leave balance",
+      url: "#",
+      tag: "HR",
+      tagBg: "#F5E6EF", tagColor: "#660044",
+      accent: "#990066",
+      icon: `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>`
+    },
+    {
+      name: "Work Orders",
+      desc: "Submit and track facility maintenance requests",
+      url: "#",
+      tag: "Operations",
+      tagBg: "#EEF5E0", tagColor: "#4A6B00",
+      accent: "#84BD00",
+      icon: `<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`
+    },
+    {
+      name: "Marketing Hub",
+      desc: "Campaigns, brand assets, and marketing resources",
+      url: "#",
+      tag: "Marketing",
+      tagBg: "#E6F6FB", tagColor: "#007A99",
+      accent: "#00A9CE",
+      icon: `<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`
+    },
+    {
+      name: "Performance Reviews",
+      desc: "Goals, feedback, and annual review cycles",
+      url: "#",
+      tag: "HR",
+      tagBg: "#FEF4DC", tagColor: "#8A5E00",
+      accent: "#F6AB00",
+      icon: `<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+    }
+  ];
+
+  /* ---- No need to edit below ---- */
+
+  document.getElementById('footerText').textContent = FOOTER_TEXT;
+  const hour = new Date().getHours();
+  document.getElementById('greetWord').textContent = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  const list = document.getElementById('appList');
+
+  APPS.forEach((app, i) => {
+    const row = document.createElement('div');
+    row.className = 'app-row';
+    row.style.setProperty('--accent', app.accent);
+    row.style.setProperty('--icon-bg', app.tagBg);
+    row.setAttribute('data-search', (app.name + ' ' + app.desc + ' ' + app.tag).toLowerCase());
+
+    row.innerHTML = `
+      <div class="app-icon-wrap">${app.icon}</div>
+      <div class="app-info">
+        <div class="app-name">${app.name}</div>
+        <div class="app-desc">${app.desc}</div>
+      </div>
+      <span class="app-tag" style="background:${app.tagBg};color:${app.tagColor};">${app.tag}</span>
+      <span class="app-chevron">→</span>
+    `;
+
+    row.addEventListener('click', () => {
+      if (app.url && app.url !== '#') {
+        window.open(app.url, '_blank');
+      } else {
+        showDetail(i);
+      }
+    });
+
+    list.appendChild(row);
+  });
+
+  function showDetail(i) {
+    const app = APPS[i];
+    document.getElementById('detailTag').textContent = app.tag;
+    document.getElementById('detailTag').style.color = app.accent;
+    document.getElementById('detailTitle').textContent = app.name;
+    document.getElementById('detailDesc').textContent = app.desc;
+    document.getElementById('detailLaunch').href = app.url;
+    document.getElementById('detailLaunch').style.background = app.accent;
+    document.getElementById('homePage').classList.remove('active');
+    document.getElementById('detailPage').classList.add('active');
+    document.getElementById('backBtn').classList.add('visible');
+    window.scrollTo(0, 0);
+  }
+
+  function showHome() {
+    document.getElementById('detailPage').classList.remove('active');
+    document.getElementById('homePage').classList.add('active');
+    document.getElementById('backBtn').classList.remove('visible');
+    window.scrollTo(0, 0);
+  }
+
+  function filterApps() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.app-row');
+    let visible = 0;
+    rows.forEach(r => {
+      const show = r.dataset.search.includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+    list.style.display = visible === 0 ? 'none' : '';
+  }
+
+</script>
+</body>
+</html>
